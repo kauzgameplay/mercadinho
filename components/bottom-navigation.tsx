@@ -10,7 +10,7 @@ interface BottomNavigationProps {
   onFabPress?: () => void;
 }
 
-export const BOTTOM_NAV_HEIGHT = 120;
+export const BOTTOM_NAV_HEIGHT = 50;
 
 export function BottomNavigation({ active, onFabPress }: BottomNavigationProps) {
   const router = useRouter();
@@ -64,7 +64,7 @@ export function BottomNavigation({ active, onFabPress }: BottomNavigationProps) 
 const styles = StyleSheet.create({
   wrapper: {
     alignItems: 'center',
-    paddingTop: 28,
+    paddingTop: 0,
     paddingBottom: 0,
   },
   nav: {
@@ -72,12 +72,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#7C3AED',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 24,
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     width: '90%',
-  marginTop: 12,
+    marginTop: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.12,
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    top: -12,
+    top: -24,
     alignSelf: 'center',
     width: 72,
     height: 72,
