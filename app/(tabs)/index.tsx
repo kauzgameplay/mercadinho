@@ -4,9 +4,15 @@ import {
 } from "@/components/bottom-navigation";
 import { CategoryFilter } from "@/components/category-filter";
 import { ProductCard } from "@/components/product-card";
+import { Fonts } from "@/constants/fonts";
+import { categoriasAPI, produtosAPI } from "@/services/api";
+import { storageService } from "@/services/storage";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -14,12 +20,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  ActivityIndicator,
-  Alert,
 } from "react-native";
-import { produtosAPI, categoriasAPI } from "@/services/api";
-import { storageService } from "@/services/storage";
-import { useRouter } from "expo-router";
 
 interface Produto {
   id: string;
@@ -221,6 +222,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
+    fontFamily: Fonts.regular,
     color: "#666",
   },
   header: {
@@ -234,11 +236,12 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontSize: 28,
-    fontWeight: "800",
+    fontFamily: Fonts.logo,
     color: "#FFF",
   },
   subtitle: {
     fontSize: 12,
+    fontFamily: Fonts.light,
     color: "#E0D4FF",
     marginTop: 2,
   },
@@ -250,7 +253,7 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: Fonts.semiBold,
     color: "#FFF",
   },
   searchContainer: {
@@ -273,6 +276,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
+    fontFamily: Fonts.regular,
     color: "#333",
   },
   filterButton: {
@@ -304,12 +308,13 @@ const styles = StyleSheet.create({
   emptyText: {
     marginTop: 16,
     fontSize: 18,
-    fontWeight: "600",
+    fontFamily: Fonts.semiBold,
     color: "#666",
   },
   emptySubtext: {
     marginTop: 8,
     fontSize: 14,
+    fontFamily: Fonts.regular,
     color: "#999",
   },
   bottomSpacer: {

@@ -1,3 +1,4 @@
+import { Fonts } from "@/constants/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
@@ -42,14 +43,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 56,
-    fontWeight: "800",
+    fontFamily: Fonts.logo,
     color: "#FFF",
     marginBottom: 8,
     letterSpacing: 2,
   },
   subtitle: {
     fontSize: 24,
-    fontWeight: "300",
+    fontFamily: Fonts.light,
     color: "#FFF",
     marginBottom: 60,
     letterSpacing: 4,

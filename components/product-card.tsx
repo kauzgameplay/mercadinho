@@ -6,7 +6,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 interface ProductCardProps {
   id?: string;
   name: string;
-  price: number;
+  price: number | string;
   rating: number;
   image: string | null | any;
   onFavorite?: () => void;
@@ -35,6 +35,10 @@ export function ProductCard({
     e.stopPropagation();
     onFavorite?.();
   };
+
+  // Converte price para número se for string
+  const priceNumber = typeof price === "string" ? parseFloat(price) : price;
+  const formattedPrice = isNaN(priceNumber) ? "0.00" : priceNumber.toFixed(2);
 
   // Verifica se é emoji (string de 1-2 caracteres) ou URL
   const isEmoji = typeof image === "string" && image.length <= 2;
@@ -68,7 +72,7 @@ export function ProductCard({
         <Text style={styles.name} numberOfLines={2}>
           {name}
         </Text>
-        <Text style={styles.price}>R$ {price.toFixed(2)}</Text>
+        <Text style={styles.price}>R$ {formattedPrice}</Text>
 
         <View style={styles.footer}>
           <View style={styles.ratingContainer}>
