@@ -133,10 +133,10 @@ export default function ProductScreen() {
                 <Text style={styles.addToCartText}>Colocar no Carrinho</Text>
               </TouchableOpacity>
             </View>
-
-            <BottomNavigation active="explore" />
           </View>
         </SafeAreaView>
+
+        <BottomNavigation active="home" />
       </View>
     </>
   );
