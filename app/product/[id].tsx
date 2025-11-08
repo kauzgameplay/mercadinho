@@ -1,3 +1,4 @@
+import { BottomNavigation } from '@/components/bottom-navigation';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -41,8 +42,9 @@ export default function ProductScreen() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
-      <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      <View style={styles.wrapper}>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
           <Ionicons name="arrow-back" size={24} color="#FFF" />
         </TouchableOpacity>
@@ -92,14 +94,19 @@ export default function ProductScreen() {
         </View>
         <TouchableOpacity style={styles.addToCartButton}>
           <Text style={styles.addToCartText}>Colocar no Carrinho</Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
+        
+        <BottomNavigation active="explore" />
+      </SafeAreaView>
       </View>
-    </SafeAreaView>
     </>
   );
-}
-
-const styles = StyleSheet.create({
+}const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    backgroundColor: '#7C3AED',
+  },
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',

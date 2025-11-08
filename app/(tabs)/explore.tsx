@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 50,
     paddingBottom: 20,
     backgroundColor: '#7C3AED',
     gap: 16,
