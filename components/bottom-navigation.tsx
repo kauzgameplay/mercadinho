@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    width: '90%',
+    width: '100%',
     marginTop: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
