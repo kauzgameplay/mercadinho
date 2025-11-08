@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
     Image,
@@ -37,7 +37,9 @@ export default function ProductScreen() {
   const totalPrice = product.price * quantity;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
@@ -91,6 +93,7 @@ export default function ProductScreen() {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    </>
   );
 }
 
