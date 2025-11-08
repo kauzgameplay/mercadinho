@@ -40,7 +40,7 @@ export default function ProfileScreen() {
       icon: "card-outline",
       title: "Pagamentos",
       subtitle: "Gerenciar formas de pagamento",
-      onPress: () => console.log("Pagamentos"),
+      onPress: () => router.push("/payment" as any),
     },
     {
       icon: "receipt-outline",
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingTop: 50,
-    paddingBottom: 16,
+    paddingBottom: 32,
     backgroundColor: "#7C3AED",
   },
   headerTitle: {
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFF",
     marginHorizontal: 20,
-    marginTop: -30,
+    marginTop: -10,
     marginBottom: 20,
     padding: 20,
     borderRadius: 16,

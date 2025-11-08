@@ -1,6 +1,7 @@
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { useCart } from "@/contexts/cart-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   Image,
@@ -12,8 +13,42 @@ import {
   View,
 } from "react-native";
 
+// Produtos sugeridos para adicionar ao carrinho
+const suggestedProducts = [
+  {
+    id: 101,
+    name: "Arroz Tipo 1 5kg",
+    price: 24.99,
+    image: require("@/assets/images/react-logo.png"),
+  },
+  {
+    id: 102,
+    name: "Feijão Preto 1kg",
+    price: 8.99,
+    image: require("@/assets/images/react-logo.png"),
+  },
+  {
+    id: 103,
+    name: "Açúcar Cristal 1kg",
+    price: 4.99,
+    image: require("@/assets/images/react-logo.png"),
+  },
+  {
+    id: 104,
+    name: "Café Torrado 500g",
+    price: 15.99,
+    image: require("@/assets/images/react-logo.png"),
+  },
+];
+
 export default function CartScreen() {
-  const { items: cartItems, updateQuantity, getTotalPrice } = useCart();
+  const router = useRouter();
+  const {
+    items: cartItems,
+    updateQuantity,
+    getTotalPrice,
+    addItem,
+  } = useCart();
 
   const handleUpdateQuantity = (id: number, delta: number) => {
     const item = cartItems.find((i) => i.id === id);
@@ -23,6 +58,18 @@ export default function CartScreen() {
         updateQuantity(id, newQuantity);
       }
     }
+  };
+
+  const handleAddSuggestedProduct = (
+    product: (typeof suggestedProducts)[0]
+  ) => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1,
+    });
   };
 
   const handleLogout = () => {
@@ -132,6 +179,59 @@ export default function CartScreen() {
                 BOLETO ANTECIPADO - A VISTA
               </Text>
             </View>
+
+            {/* Sugestões de Produtos */}
+            <View style={styles.suggestionsContainer}>
+              <Text style={styles.suggestionsTitle}>Sugestões para você</Text>
+              <Text style={styles.suggestionsSubtitle}>
+                Adicione mais itens ao seu carrinho
+              </Text>
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.suggestionsScroll}
+              >
+                {suggestedProducts.map((product) => {
+                  const isInCart = cartItems.some(
+                    (item) => item.id === product.id
+                  );
+
+                  return (
+                    <View key={product.id} style={styles.suggestionCard}>
+                      <Image
+                        source={product.image}
+                        style={styles.suggestionImage}
+                      />
+                      <Text style={styles.suggestionName} numberOfLines={2}>
+                        {product.name}
+                      </Text>
+                      <Text style={styles.suggestionPrice}>
+                        R$ {product.price.toFixed(2)}
+                      </Text>
+
+                      <TouchableOpacity
+                        style={[
+                          styles.addSuggestionButton,
+                          isInCart && styles.addSuggestionButtonDisabled,
+                        ]}
+                        onPress={() => handleAddSuggestedProduct(product)}
+                        disabled={isInCart}
+                      >
+                        <Ionicons
+                          name={isInCart ? "checkmark" : "add"}
+                          size={20}
+                          color="#FFF"
+                        />
+                        <Text style={styles.addSuggestionButtonText}>
+                          {isInCart ? "Adicionado" : "Adicionar"}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })}
+              </ScrollView>
+            </View>
           </>
         )}
 
@@ -141,7 +241,10 @@ export default function CartScreen() {
       {/* Botão Finalizar */}
       {cartItems.length > 0 && (
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.checkoutButton}>
+          <TouchableOpacity
+            style={styles.checkoutButton}
+            onPress={() => router.push("/checkout" as any)}
+          >
             <Text style={styles.checkoutButtonText}>FINALIZAR PEDIDO</Text>
           </TouchableOpacity>
         </View>
@@ -351,5 +454,76 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 20,
+  },
+  suggestionsContainer: {
+    backgroundColor: "#FFF",
+    marginHorizontal: 16,
+    marginTop: 24,
+    padding: 20,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  suggestionsTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+    marginBottom: 4,
+  },
+  suggestionsSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 16,
+  },
+  suggestionsScroll: {
+    gap: 12,
+    paddingRight: 20,
+  },
+  suggestionCard: {
+    width: 140,
+    backgroundColor: "#F9F9F9",
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+  },
+  suggestionImage: {
+    width: "100%",
+    height: 80,
+    resizeMode: "contain",
+    marginBottom: 8,
+  },
+  suggestionName: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 6,
+    minHeight: 36,
+  },
+  suggestionPrice: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#7C3AED",
+    marginBottom: 10,
+  },
+  addSuggestionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#7C3AED",
+    borderRadius: 8,
+    paddingVertical: 8,
+    gap: 4,
+  },
+  addSuggestionButtonDisabled: {
+    backgroundColor: "#4CAF50",
+  },
+  addSuggestionButtonText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#FFF",
   },
 });
