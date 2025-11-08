@@ -2,6 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -12,18 +14,43 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { clienteAPI } from "../services/api";
+import { storageService } from "../services/storage";
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    // Aqui você adicionará a lógica de autenticação
-    console.log("Login:", email, password);
-    // Após login bem-sucedido, redireciona para home
-    router.replace("/(tabs)");
+  const handleLogin = async () => {
+    // Validação
+    if (!email || !password) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await clienteAPI.login(email, password);
+
+      if (result.success && result.cliente) {
+        // Salva dados do cliente
+        await storageService.saveCliente(result.cliente);
+
+        // Redireciona para home
+        router.replace("/(tabs)");
+      } else {
+        Alert.alert("Erro", result.message || "Erro ao fazer login");
+      }
+    } catch (error) {
+      Alert.alert("Erro", "Erro ao conectar com o servidor");
+      console.error("Erro no login:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleForgotPassword = () => {
@@ -116,8 +143,16 @@ export default function LoginScreen() {
             <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>Entrar</Text>
+          <TouchableOpacity
+            style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#FFF" />
+            ) : (
+              <Text style={styles.loginButtonText}>Entrar</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.divider}>
@@ -235,6 +270,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
+  },
+  loginButtonDisabled: {
+    backgroundColor: "#B8A3E8",
   },
   loginButtonText: {
     fontSize: 16,

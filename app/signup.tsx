@@ -2,6 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -12,6 +14,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { clienteAPI } from "../services/api";
+import { storageService } from "../services/storage";
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -22,12 +26,55 @@ export default function SignUpScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = () => {
-    // Aqui você adicionará a lógica de cadastro
-    console.log("Cadastro:", { name, email, phone, password });
-    // Após cadastro bem-sucedido, redireciona para login ou home
-    router.replace("/(tabs)");
+  const handleSignUp = async () => {
+    // Validação
+    if (!name || !email || !password) {
+      Alert.alert("Erro", "Por favor, preencha os campos obrigatórios");
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert("Erro", "A senha deve ter no mínimo 6 caracteres");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert("Erro", "As senhas não coincidem");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await clienteAPI.register({
+        nome: name,
+        email: email,
+        senha: password,
+        telefone: phone || undefined,
+      });
+
+      if (result.success && result.cliente) {
+        // Salva dados do cliente
+        await storageService.saveCliente(result.cliente);
+
+        // Mostra mensagem de sucesso
+        Alert.alert("Sucesso", "Cadastro realizado com sucesso!", [
+          {
+            text: "OK",
+            onPress: () => router.replace("/(tabs)"),
+          },
+        ]);
+      } else {
+        Alert.alert("Erro", result.message || "Erro ao criar conta");
+      }
+    } catch (error) {
+      Alert.alert("Erro", "Erro ao conectar com o servidor");
+      console.error("Erro no cadastro:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogin = () => {
@@ -183,8 +230,19 @@ export default function SignUpScreen() {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
-            <Text style={styles.signupButtonText}>Criar conta</Text>
+          <TouchableOpacity
+            style={[
+              styles.signupButton,
+              loading && styles.signupButtonDisabled,
+            ]}
+            onPress={handleSignUp}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#FFF" />
+            ) : (
+              <Text style={styles.signupButtonText}>Criar conta</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.loginContainer}>
@@ -293,6 +351,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
+  },
+  signupButtonDisabled: {
+    backgroundColor: "#B8A3E8",
   },
   signupButtonText: {
     fontSize: 16,
