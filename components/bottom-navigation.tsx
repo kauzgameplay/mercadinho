@@ -74,38 +74,27 @@ export function BottomNavigation({
           </Text>
         </TouchableOpacity>
 
-        {/* Espaço para o FAB */}
-        <View style={styles.fabSpace} />
-
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => handleNavigate("chat")}
-        >
-          <Ionicons
-            name="chatbubble-ellipses-outline"
-            size={24}
-            color="#E0D4FF"
-          />
-          <Text style={styles.navLabel}>Chat</Text>
+        {/* Carrinho */}
+        <TouchableOpacity style={styles.navItem} onPress={handleCartPress}>
+          <View>
+            <Ionicons name="cart" size={24} color="#E0D4FF" />
+            {itemCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{itemCount}</Text>
+              </View>
+            )}
+          </View>
+          <Text style={styles.navLabel}>Carrinho</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => handleNavigate("favorites")}
         >
-          <Ionicons name="heart-outline" size={24} color="#E0D4FF" />
-          <Text style={styles.navLabel}>Favoritos</Text>
+          <Ionicons name="person-outline" size={24} color="#E0D4FF" />
+          <Text style={styles.navLabel}>Conta</Text>
         </TouchableOpacity>
       </View>
-
-      {/* FAB para Carrinho */}
-      <TouchableOpacity style={styles.fab} onPress={handleCartPress}>
-        <Ionicons name="cart" size={28} color="#FFF" />
-        {itemCount > 0 && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{itemCount}</Text>
-          </View>
-        )}
-      </TouchableOpacity>
     </View>
   );
 }
@@ -150,45 +139,21 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontWeight: "600",
   },
-  fabSpace: {
-    width: 60,
-  },
-  fab: {
-    position: "absolute",
-    top: -28,
-    left: "50%",
-    marginLeft: -28,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#7C3AED",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#7C3AED",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-    borderWidth: 4,
-    borderColor: "#FFF",
-  },
   badge: {
     position: "absolute",
-    top: 0,
-    right: 0,
+    top: -4,
+    right: -8,
     backgroundColor: "#E63946",
     borderRadius: 10,
-    minWidth: 20,
-    height: 20,
+    minWidth: 18,
+    height: 18,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 4,
-    borderWidth: 2,
-    borderColor: "#FFF",
   },
   badgeText: {
     color: "#FFF",
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "700",
   },
 });

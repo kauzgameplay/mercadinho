@@ -13,12 +13,7 @@ import {
 } from "react-native";
 
 export default function CartScreen() {
-  const {
-    items: cartItems,
-    updateQuantity,
-    getTotalPrice,
-    clearCart,
-  } = useCart();
+  const { items: cartItems, updateQuantity, getTotalPrice } = useCart();
 
   const handleUpdateQuantity = (id: number, delta: number) => {
     const item = cartItems.find((i) => i.id === id);
@@ -30,8 +25,9 @@ export default function CartScreen() {
     }
   };
 
-  const handleClearCart = () => {
-    clearCart();
+  const handleLogout = () => {
+    // Aqui você pode adicionar a lógica de logout
+    console.log("Usuário saiu");
   };
 
   const totalProducts = getTotalPrice();
@@ -45,8 +41,8 @@ export default function CartScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Carrinho</Text>
-        <TouchableOpacity onPress={handleClearCart}>
-          <Text style={styles.clearButton}>Limpar</Text>
+        <TouchableOpacity onPress={handleLogout}>
+          <Text style={styles.clearButton}>Sair</Text>
         </TouchableOpacity>
       </View>
 

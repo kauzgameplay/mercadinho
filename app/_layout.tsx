@@ -11,7 +11,7 @@ import { CartProvider } from "@/contexts/cart-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export const unstable_settings = {
-  anchor: "(tabs)",
+  initialRouteName: "splash",
 };
 
 export default function RootLayout() {
@@ -21,6 +21,7 @@ export default function RootLayout() {
     <CartProvider>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
+          <Stack.Screen name="splash" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="product/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="cart" options={{ headerShown: false }} />

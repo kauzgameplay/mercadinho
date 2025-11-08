@@ -1,53 +1,114 @@
-import { BOTTOM_NAV_HEIGHT, BottomNavigation } from '@/components/bottom-navigation';
-import { CategoryFilter } from '@/components/category-filter';
-import { ProductCard } from '@/components/product-card';
-import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
-import { ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  BOTTOM_NAV_HEIGHT,
+  BottomNavigation,
+} from "@/components/bottom-navigation";
+import { CategoryFilter } from "@/components/category-filter";
+import { ProductCard } from "@/components/product-card";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import {
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 // Mock de produtos
 const PRODUCTS = [
-  { id: 1, name: 'Picanha Friboi kg', price: 69.00, rating: 4.9, image: require('@/assets/images/partial-react-logo.png'), category: 'Todos' },
-  { id: 2, name: 'Coca-Cola 2L', price: 8.99, rating: 4.8, image: require('@/assets/images/partial-react-logo.png'), category: 'Bebidas' },
-  { id: 3, name: 'Pão Frances un', price: 1.29, rating: 4.6, image: require('@/assets/images/partial-react-logo.png'), category: 'Todos' },
-  { id: 4, name: 'Batata Inglesa kg', price: 1.99, rating: 4.5, image: require('@/assets/images/partial-react-logo.png'), category: 'Todos' },
-  { id: 5, name: 'Arroz Tio João 5kg', price: 28.90, rating: 4.7, image: require('@/assets/images/partial-react-logo.png'), category: 'Limpeza' },
-  { id: 6, name: 'Feijão Preto kg', price: 7.50, rating: 4.6, image: require('@/assets/images/partial-react-logo.png'), category: 'Todos' },
+  {
+    id: 1,
+    name: "Picanha Friboi kg",
+    price: 69.0,
+    rating: 4.9,
+    image: require("@/assets/images/partial-react-logo.png"),
+    category: "Todos",
+  },
+  {
+    id: 2,
+    name: "Coca-Cola 2L",
+    price: 8.99,
+    rating: 4.8,
+    image: require("@/assets/images/partial-react-logo.png"),
+    category: "Bebidas",
+  },
+  {
+    id: 3,
+    name: "Pão Frances un",
+    price: 1.29,
+    rating: 4.6,
+    image: require("@/assets/images/partial-react-logo.png"),
+    category: "Todos",
+  },
+  {
+    id: 4,
+    name: "Batata Inglesa kg",
+    price: 1.99,
+    rating: 4.5,
+    image: require("@/assets/images/partial-react-logo.png"),
+    category: "Todos",
+  },
+  {
+    id: 5,
+    name: "Arroz Tio João 5kg",
+    price: 28.9,
+    rating: 4.7,
+    image: require("@/assets/images/partial-react-logo.png"),
+    category: "Limpeza",
+  },
+  {
+    id: 6,
+    name: "Feijão Preto kg",
+    price: 7.5,
+    rating: 4.6,
+    image: require("@/assets/images/partial-react-logo.png"),
+    category: "Todos",
+  },
 ];
 
-const CATEGORIES = ['Todos', 'Limpeza', 'Bebidas', 'Açougue'];
+const CATEGORIES = ["Todos", "Limpeza", "Bebidas", "Açougue"];
 
 export default function HomeScreen() {
-  const [selectedCategory, setSelectedCategory] = useState('Todos');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("Todos");
+  const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<number[]>([]);
 
-  const filteredProducts = PRODUCTS.filter(product => {
-    const matchesCategory = selectedCategory === 'Todos' || product.category === selectedCategory;
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredProducts = PRODUCTS.filter((product) => {
+    const matchesCategory =
+      selectedCategory === "Todos" || product.category === selectedCategory;
+    const matchesSearch = product.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
   const toggleFavorite = (productId: number) => {
-    setFavorites(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId)
+    setFavorites((prev) =>
+      prev.includes(productId)
+        ? prev.filter((id) => id !== productId)
         : [...prev, productId]
     );
+  };
+
+  const handleLogout = () => {
+    // Aqui você pode adicionar a lógica de logout
+    console.log("Usuário saiu");
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <View>
           <Text style={styles.logo}>SantaFé</Text>
           <Text style={styles.subtitle}>O Supermercado na Sua casa</Text>
         </View>
-        <TouchableOpacity style={styles.profileButton}>
-          <Ionicons name="person-circle-outline" size={32} color="#FFF" />
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Sair</Text>
         </TouchableOpacity>
       </View>
 
@@ -82,7 +143,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.productsGrid}>
-          {filteredProducts.map(product => (
+          {filteredProducts.map((product) => (
             <ProductCard
               key={product.id}
               id={product.id.toString()}
@@ -106,42 +167,50 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: "#F8F8F8",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 20,
-    backgroundColor: '#7C3AED',
+    backgroundColor: "#7C3AED",
   },
   logo: {
     fontSize: 28,
-    fontWeight: '800',
-    color: '#FFF',
+    fontWeight: "800",
+    color: "#FFF",
   },
   subtitle: {
     fontSize: 12,
-    color: '#E0D4FF',
+    color: "#E0D4FF",
     marginTop: 2,
   },
-  profileButton: {
-    padding: 4,
+  logoutButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 20,
+  },
+  logoutText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#FFF",
   },
   searchContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#7C3AED',
+    backgroundColor: "#7C3AED",
     gap: 12,
   },
   searchBar: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -150,15 +219,15 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   filterButton: {
     width: 48,
     height: 48,
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   productsContainer: {
     flex: 1,
@@ -169,9 +238,9 @@ const styles = StyleSheet.create({
     paddingBottom: BOTTOM_NAV_HEIGHT,
   },
   productsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   bottomSpacer: {
     height: 0,
