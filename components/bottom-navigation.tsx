@@ -29,6 +29,9 @@ export function BottomNavigation({
       case "explore":
         router.replace("/(tabs)/explore");
         break;
+      case "favorites":
+        router.push("/profile" as any);
+        break;
       default:
         break;
     }
