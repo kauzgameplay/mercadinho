@@ -1,8 +1,8 @@
 import { useCart } from "@/contexts/cart-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React from "react";
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import { useRouter, usePathname } from "expo-router";
+import React, { useCallback } from "react";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type TabKey = "home" | "explore" | "credit" | "chat" | "favorites";
@@ -19,35 +19,64 @@ export function BottomNavigation({
   onFabPress,
 }: BottomNavigationProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { getTotalItems } = useCart();
   const itemCount = getTotalItems();
   const insets = useSafeAreaInsets();
 
-  const handleHomePress = () => {
-    router.push("/(tabs)" as any);
-  };
+  const handleHomePress = useCallback(() => {
+    console.log("Home pressed, current path:", pathname);
+    try {
+      if (pathname === "/" || pathname === "/(tabs)") {
+        // Já está na home, não faz nada
+        return;
+      }
+      router.replace("/(tabs)");
+    } catch (error) {
+      console.error("Error navigating to home:", error);
+    }
+  }, [router, pathname]);
 
-  const handleExplorePress = () => {
-    router.push("/(tabs)/explore" as any);
-  };
+  const handleExplorePress = useCallback(() => {
+    console.log("Explore pressed, current path:", pathname);
+    try {
+      if (pathname === "/(tabs)/explore") {
+        // Já está no explore, não faz nada
+        return;
+      }
+      router.replace("/(tabs)/explore");
+    } catch (error) {
+      console.error("Error navigating to explore:", error);
+    }
+  }, [router, pathname]);
 
-  const handleCartPress = () => {
-    router.push("/cart" as any);
-  };
+  const handleCartPress = useCallback(() => {
+    console.log("Cart pressed, current path:", pathname);
+    try {
+      router.push("/(cart)/cart");
+    } catch (error) {
+      console.error("Error navigating to cart:", error);
+    }
+  }, [router, pathname]);
 
-  const handleProfilePress = () => {
-    router.push("/(account)/profile" as any);
-  };
+  const handleProfilePress = useCallback(() => {
+    console.log("Profile pressed, current path:", pathname);
+    try {
+      router.push("/(account)/profile");
+    } catch (error) {
+      console.error("Error navigating to profile:", error);
+    }
+  }, [router, pathname]);
 
   return (
     <View style={styles.wrapper}>
       <View
         style={[styles.nav, { paddingBottom: Math.max(insets.bottom, 10) }]}
       >
-        <Pressable
+        <TouchableOpacity
           style={styles.navItem}
           onPress={handleHomePress}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          activeOpacity={0.7}
         >
           <Ionicons
             name="home"
@@ -59,12 +88,12 @@ export function BottomNavigation({
           >
             Home
           </Text>
-        </Pressable>
+        </TouchableOpacity>
 
-        <Pressable
+        <TouchableOpacity
           style={styles.navItem}
           onPress={handleExplorePress}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          activeOpacity={0.7}
         >
           <Ionicons
             name="pricetag-outline"
@@ -78,13 +107,13 @@ export function BottomNavigation({
           >
             Ofertas
           </Text>
-        </Pressable>
+        </TouchableOpacity>
 
         {/* Carrinho */}
-        <Pressable
+        <TouchableOpacity
           style={styles.navItem}
           onPress={handleCartPress}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          activeOpacity={0.7}
         >
           <View>
             <Ionicons name="cart" size={24} color="#E0D4FF" />
@@ -95,12 +124,12 @@ export function BottomNavigation({
             )}
           </View>
           <Text style={styles.navLabel}>Carrinho</Text>
-        </Pressable>
+        </TouchableOpacity>
 
-        <Pressable
+        <TouchableOpacity
           style={styles.navItem}
           onPress={handleProfilePress}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          activeOpacity={0.7}
         >
           <Ionicons
             name="person-outline"
@@ -114,7 +143,7 @@ export function BottomNavigation({
           >
             Conta
           </Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );
