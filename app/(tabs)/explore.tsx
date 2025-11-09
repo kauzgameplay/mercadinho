@@ -2,6 +2,7 @@ import {
   BOTTOM_NAV_HEIGHT,
   BottomNavigation,
 } from "@/components/bottom-navigation";
+import { PageTransition } from "@/components/page-transition";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -20,52 +21,57 @@ export default function ExploreScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
+    <PageTransition type="fade">
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
 
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <View>
-            <Text style={styles.title}>Descubra</Text>
-            <Text style={styles.subtitle}>Ofertas especiais para você</Text>
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <View>
+              <Text style={styles.title}>Descubra</Text>
+              <Text style={styles.subtitle}>Ofertas especiais para você</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={handleLogout}
+            >
+              <Text style={styles.logoutText}>Sair</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutText}>Sair</Text>
-          </TouchableOpacity>
+          <View style={styles.searchBar}>
+            <Ionicons name="search" size={18} color="#FFF" />
+            <TextInput
+              placeholder="Buscar promoções"
+              placeholderTextColor="rgba(255, 255, 255, 0.7)"
+              style={styles.searchInput}
+            />
+          </View>
         </View>
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={18} color="#FFF" />
-          <TextInput
-            placeholder="Buscar promoções"
-            placeholderTextColor="rgba(255, 255, 255, 0.7)"
-            style={styles.searchInput}
-          />
-        </View>
+
+        <ScrollView
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.cardLarge}>
+            <Text style={styles.cardTitle}>Cupom da Semana</Text>
+            <Text style={styles.cardHighlight}>10% OFF em bebidas</Text>
+          </View>
+
+          <View style={styles.grid}>
+            <View style={styles.cardSmall}>
+              <Text style={styles.cardLabel}>Club SantaFé</Text>
+              <Text style={styles.cardValue}>Compre 2 Leve 3</Text>
+            </View>
+            <View style={styles.cardSmall}>
+              <Text style={styles.cardLabel}>Entrega Grátis</Text>
+              <Text style={styles.cardValue}>Pedidos acima de R$ 99</Text>
+            </View>
+          </View>
+        </ScrollView>
+
+        <BottomNavigation active="explore" />
       </View>
-
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.cardLarge}>
-          <Text style={styles.cardTitle}>Cupom da Semana</Text>
-          <Text style={styles.cardHighlight}>10% OFF em bebidas</Text>
-        </View>
-
-        <View style={styles.grid}>
-          <View style={styles.cardSmall}>
-            <Text style={styles.cardLabel}>Club SantaFé</Text>
-            <Text style={styles.cardValue}>Compre 2 Leve 3</Text>
-          </View>
-          <View style={styles.cardSmall}>
-            <Text style={styles.cardLabel}>Entrega Grátis</Text>
-            <Text style={styles.cardValue}>Pedidos acima de R$ 99</Text>
-          </View>
-        </View>
-      </ScrollView>
-
-      <BottomNavigation active="explore" />
-    </View>
+    </PageTransition>
   );
 }
 

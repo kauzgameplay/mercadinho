@@ -4,6 +4,8 @@ import {
 } from "@/components/bottom-navigation";
 import { CategoryFilter } from "@/components/category-filter";
 import { ProductCard } from "@/components/product-card";
+import { PageTransition } from "@/components/page-transition";
+import { ProductCardSkeletonGrid } from "@/components/skeletons/product-card-skeleton";
 import { Fonts } from "@/constants/fonts";
 import { categoriasAPI, produtosAPI } from "@/services/api";
 import { storageService } from "@/services/storage";
@@ -11,7 +13,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   ScrollView,
   StatusBar,
@@ -124,89 +125,84 @@ export default function HomeScreen() {
 
   const categoryNames = ["Todos", ...categorias.map((cat) => cat.nome).sort()];
 
-  if (loading) {
-    return (
-      <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color="#7C3AED" />
-        <Text style={styles.loadingText}>Carregando produtos...</Text>
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
+    <PageTransition type="fade">
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.logo}>SantaFé</Text>
-          <Text style={styles.subtitle}>O Supermercado na Sua casa</Text>
-        </View>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Sair</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={20} color="#999" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Procurar"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor="#999"
-          />
-        </View>
-        <TouchableOpacity style={styles.filterButton}>
-          <Ionicons name="options" size={24} color="#7C3AED" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Category Filter */}
-      <CategoryFilter
-        categories={categoryNames}
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
-      />
-
-      {/* Products Grid */}
-      <ScrollView
-        style={styles.productsContainer}
-        contentContainerStyle={styles.productsContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {filteredProducts.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Ionicons name="search-outline" size={64} color="#CCC" />
-            <Text style={styles.emptyText}>Nenhum produto encontrado</Text>
-            <Text style={styles.emptySubtext}>
-              Tente buscar por outro termo
-            </Text>
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.logo}>SantaFé</Text>
+            <Text style={styles.subtitle}>O Supermercado na Sua casa</Text>
           </View>
-        ) : (
-          <View style={styles.productsGrid}>
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                name={product.nome}
-                price={product.preco}
-                rating={4.5}
-                image={product.imagem}
-                onFavorite={() => toggleFavorite(product.id)}
-                isFavorite={favorites.includes(product.id)}
-              />
-            ))}
-          </View>
-        )}
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutText}>Sair</Text>
+          </TouchableOpacity>
+        </View>
 
-      <BottomNavigation active="home" />
-    </View>
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <View style={styles.searchBar}>
+            <Ionicons name="search" size={20} color="#999" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Procurar"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <TouchableOpacity style={styles.filterButton}>
+            <Ionicons name="options" size={24} color="#7C3AED" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Category Filter */}
+        <CategoryFilter
+          categories={categoryNames}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
+
+        {/* Products Grid */}
+        <ScrollView
+          style={styles.productsContainer}
+          contentContainerStyle={styles.productsContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {loading ? (
+            <ProductCardSkeletonGrid count={6} />
+          ) : filteredProducts.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="search-outline" size={64} color="#CCC" />
+              <Text style={styles.emptyText}>Nenhum produto encontrado</Text>
+              <Text style={styles.emptySubtext}>
+                Tente buscar por outro termo
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.productsGrid}>
+              {filteredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  name={product.nome}
+                  price={product.preco}
+                  rating={4.5}
+                  image={product.imagem}
+                  onFavorite={() => toggleFavorite(product.id)}
+                  isFavorite={favorites.includes(product.id)}
+                />
+              ))}
+            </View>
+          )}
+          <View style={styles.bottomSpacer} />
+        </ScrollView>
+
+        <BottomNavigation active="home" />
+      </View>
+    </PageTransition>
   );
 }
 
@@ -214,16 +210,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F8F8F8",
-  },
-  centerContent: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    fontFamily: Fonts.regular,
-    color: "#666",
   },
   header: {
     flexDirection: "row",

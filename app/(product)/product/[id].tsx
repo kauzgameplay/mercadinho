@@ -1,5 +1,6 @@
 // Produto movido para (product)/product
 import { BottomNavigation } from "@/components/bottom-navigation";
+import { PageTransition } from "@/components/page-transition";
 import { useCart } from "@/contexts/cart-context";
 import { produtosAPI } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
@@ -85,36 +86,40 @@ export default function ProductScreen() {
   };
   if (loading) {
     return (
-      <View style={styles.wrapper}>
-        <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
-        <SafeAreaView style={styles.safeArea}>
-          <View style={[styles.container, styles.centerContent]}>
-            <ActivityIndicator size="large" color="#7C3AED" />
-            <Text style={styles.loadingText}>Carregando produto...</Text>
-          </View>
-        </SafeAreaView>
-      </View>
+      <PageTransition type="fade">
+        <View style={styles.wrapper}>
+          <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
+          <SafeAreaView style={styles.safeArea}>
+            <View style={[styles.container, styles.centerContent]}>
+              <ActivityIndicator size="large" color="#7C3AED" />
+              <Text style={styles.loadingText}>Carregando produto...</Text>
+            </View>
+          </SafeAreaView>
+        </View>
+      </PageTransition>
     );
   }
   if (error || !produto) {
     return (
-      <View style={styles.wrapper}>
-        <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
-        <SafeAreaView style={styles.safeArea}>
-          <View style={[styles.container, styles.centerContent]}>
-            <Ionicons name="alert-circle-outline" size={64} color="#999" />
-            <Text style={styles.errorText}>
-              {error || "Produto não encontrado"}
-            </Text>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => router.back()}
-            >
-              <Text style={styles.backButtonText}>Voltar</Text>
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-      </View>
+      <PageTransition type="fade">
+        <View style={styles.wrapper}>
+          <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
+          <SafeAreaView style={styles.safeArea}>
+            <View style={[styles.container, styles.centerContent]}>
+              <Ionicons name="alert-circle-outline" size={64} color="#999" />
+              <Text style={styles.errorText}>
+                {error || "Produto não encontrado"}
+              </Text>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => router.back()}
+              >
+                <Text style={styles.backButtonText}>Voltar</Text>
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
+        </View>
+      </PageTransition>
     );
   }
   const preco =
@@ -134,7 +139,7 @@ export default function ProductScreen() {
       ? `https://santafe-dashboard.vercel.app${produto.imagem}`
       : produto.imagem;
   return (
-    <>
+    <PageTransition type="scale">
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.wrapper}>
         <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
@@ -246,7 +251,7 @@ export default function ProductScreen() {
         </SafeAreaView>
         <BottomNavigation active="home" />
       </View>
-    </>
+    </PageTransition>
   );
 }
 const styles = StyleSheet.create({

@@ -1,5 +1,7 @@
 // Conteúdo original de profile.tsx movido para (account) sem alterações
 import { BottomNavigation } from "@/components/bottom-navigation";
+import { PageTransition } from "@/components/page-transition";
+import { ProfileSkeleton } from "@/components/skeletons/profile-skeleton";
 import { useUser } from "@/contexts/user-context";
 import { userAPI } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
@@ -147,10 +149,16 @@ export default function ProfileScreen() {
   };
   if (contextLoading || isLoadingData) {
     return (
-      <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color="#7C3AED" />
-        <Text style={styles.loadingText}>Carregando...</Text>
-      </View>
+      <PageTransition type="fade">
+        <View style={styles.container}>
+          <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Minha Conta</Text>
+          </View>
+          <ProfileSkeleton />
+          <BottomNavigation active="favorites" />
+        </View>
+      </PageTransition>
     );
   }
   if (!user) {
@@ -201,197 +209,197 @@ export default function ProfileScreen() {
     },
   ];
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>
-          {isEditing ? "Editar Perfil" : "Minha Conta"}
-        </Text>
-        {isEditing ? (
-          <View style={styles.headerActions}>
-            <TouchableOpacity
-              onPress={handleCancel}
-              style={styles.headerButton}
-            >
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleSave}
-              style={styles.saveButton}
-              disabled={isSaving}
-            >
-              {isSaving ? (
-                <ActivityIndicator size="small" color="#FFF" />
-              ) : (
-                <Text style={styles.saveButtonText}>Salvar</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <TouchableOpacity onPress={handleLogout}>
-            <Text style={styles.logoutButton}>Sair</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.profileCard}>
-          <View style={styles.avatarContainer}>
-            <Ionicons name="person" size={40} color="#FFF" />
-          </View>
-          <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{nome || "Usuário"}</Text>
-            <Text style={styles.profileEmail}>{email}</Text>
-          </View>
-          {!isEditing && (
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => setIsEditing(true)}
-            >
-              <Ionicons name="create-outline" size={20} color="#7C3AED" />
+    <PageTransition type="slideUp">
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>
+            {isEditing ? "Editar Perfil" : "Minha Conta"}
+          </Text>
+          {isEditing ? (
+            <View style={styles.headerActions}>
+              <TouchableOpacity
+                onPress={handleCancel}
+                style={styles.headerButton}
+              >
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleSave}
+                style={styles.saveButton}
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <ActivityIndicator size="small" color="#FFF" />
+                ) : (
+                  <Text style={styles.saveButtonText}>Salvar</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity onPress={handleLogout}>
+              <Text style={styles.logoutButton}>Sair</Text>
             </TouchableOpacity>
           )}
         </View>
-        {isEditing ? (
-          <View style={styles.formContainer}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Nome completo *</Text>
-              <TextInput
-                style={styles.input}
-                value={nome}
-                onChangeText={setNome}
-                placeholder="Digite seu nome"
-                placeholderTextColor="#999"
-              />
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.profileCard}>
+            <View style={styles.avatarContainer}>
+              <Ionicons name="person" size={40} color="#FFF" />
             </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Email *</Text>
-              <TextInput
-                style={styles.input}
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Digite seu email"
-                placeholderTextColor="#999"
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+            <View style={styles.profileInfo}>
+              <Text style={styles.profileName}>{nome || "Usuário"}</Text>
+              <Text style={styles.profileEmail}>{email}</Text>
             </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Telefone</Text>
-              <TextInput
-                style={styles.input}
-                value={telefone}
-                onChangeText={setTelefone}
-                placeholder="(00) 00000-0000"
-                placeholderTextColor="#999"
-                keyboardType="phone-pad"
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>CPF</Text>
-              <TextInput
-                style={styles.input}
-                value={cpf}
-                onChangeText={setCpf}
-                placeholder="000.000.000-00"
-                placeholderTextColor="#999"
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Endereço</Text>
-              <TextInput
-                style={styles.input}
-                value={endereco}
-                onChangeText={setEndereco}
-                placeholder="Rua, número, complemento"
-                placeholderTextColor="#999"
-              />
-            </View>
-            <View style={styles.inputRow}>
-              <View style={[styles.inputGroup, { flex: 2 }]}>
-                <Text style={styles.inputLabel}>Cidade</Text>
-                <TextInput
-                  style={styles.input}
-                  value={cidade}
-                  onChangeText={setCidade}
-                  placeholder="Cidade"
-                  placeholderTextColor="#999"
-                />
-              </View>
-              <View style={[styles.inputGroup, { flex: 1, marginLeft: 12 }]}>
-                <Text style={styles.inputLabel}>Estado</Text>
-                <TextInput
-                  style={styles.input}
-                  value={estado}
-                  onChangeText={setEstado}
-                  placeholder="UF"
-                  placeholderTextColor="#999"
-                  maxLength={2}
-                  autoCapitalize="characters"
-                />
-              </View>
-            </View>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>CEP</Text>
-              <TextInput
-                style={styles.input}
-                value={cep}
-                onChangeText={setCep}
-                placeholder="00000-000"
-                placeholderTextColor="#999"
-                keyboardType="numeric"
-              />
-            </View>
-            <Text style={styles.requiredNote}>* Campos obrigatórios</Text>
+            {!isEditing && (
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => setIsEditing(true)}
+              >
+                <Ionicons name="create-outline" size={20} color="#7C3AED" />
+              </TouchableOpacity>
+            )}
           </View>
-        ) : (
-          <>
-            <View style={styles.menuContainer}>
-              {menuItems.map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.menuItem}
-                  onPress={item.onPress}
-                >
-                  <View style={styles.menuIconContainer}>
-                    <Ionicons
-                      name={item.icon as any}
-                      size={24}
-                      color="#7C3AED"
-                    />
-                  </View>
-                  <View style={styles.menuTextContainer}>
-                    <Text style={styles.menuTitle}>{item.title}</Text>
-                    <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={20} color="#999" />
-                </TouchableOpacity>
-              ))}
+          {isEditing ? (
+            <View style={styles.formContainer}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Nome completo *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={nome}
+                  onChangeText={setNome}
+                  placeholder="Digite seu nome"
+                  placeholderTextColor="#999"
+                />
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Email *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="Digite seu email"
+                  placeholderTextColor="#999"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Telefone</Text>
+                <TextInput
+                  style={styles.input}
+                  value={telefone}
+                  onChangeText={setTelefone}
+                  placeholder="(00) 00000-0000"
+                  placeholderTextColor="#999"
+                  keyboardType="phone-pad"
+                />
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>CPF</Text>
+                <TextInput
+                  style={styles.input}
+                  value={cpf}
+                  onChangeText={setCpf}
+                  placeholder="000.000.000-00"
+                  placeholderTextColor="#999"
+                  keyboardType="numeric"
+                />
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Endereço</Text>
+                <TextInput
+                  style={styles.input}
+                  value={endereco}
+                  onChangeText={setEndereco}
+                  placeholder="Rua, número, complemento"
+                  placeholderTextColor="#999"
+                />
+              </View>
+              <View style={styles.inputRow}>
+                <View style={[styles.inputGroup, { flex: 2 }]}>
+                  <Text style={styles.inputLabel}>Cidade</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={cidade}
+                    onChangeText={setCidade}
+                    placeholder="Cidade"
+                    placeholderTextColor="#999"
+                  />
+                </View>
+                <View style={[styles.inputGroup, { flex: 1, marginLeft: 12 }]}>
+                  <Text style={styles.inputLabel}>Estado</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={estado}
+                    onChangeText={setEstado}
+                    placeholder="UF"
+                    placeholderTextColor="#999"
+                    maxLength={2}
+                    autoCapitalize="characters"
+                  />
+                </View>
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>CEP</Text>
+                <TextInput
+                  style={styles.input}
+                  value={cep}
+                  onChangeText={setCep}
+                  placeholder="00000-000"
+                  placeholderTextColor="#999"
+                  keyboardType="numeric"
+                />
+              </View>
+              <Text style={styles.requiredNote}>* Campos obrigatórios</Text>
             </View>
-            <TouchableOpacity
-              style={styles.logoutButtonLarge}
-              onPress={handleLogout}
-            >
-              <Ionicons name="log-out-outline" size={20} color="#E63946" />
-              <Text style={styles.logoutButtonText}>Sair da conta</Text>
-            </TouchableOpacity>
-            <Text style={styles.version}>Versão 1.0.0</Text>
-          </>
-        )}
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
-      <BottomNavigation active="favorites" />
-    </View>
+          ) : (
+            <>
+              <View style={styles.menuContainer}>
+                {menuItems.map((item, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.menuItem}
+                    onPress={item.onPress}
+                  >
+                    <View style={styles.menuIconContainer}>
+                      <Ionicons
+                        name={item.icon as any}
+                        size={24}
+                        color="#7C3AED"
+                      />
+                    </View>
+                    <View style={styles.menuTextContainer}>
+                      <Text style={styles.menuTitle}>{item.title}</Text>
+                      <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color="#999" />
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <TouchableOpacity
+                style={styles.logoutButtonLarge}
+                onPress={handleLogout}
+              >
+                <Ionicons name="log-out-outline" size={20} color="#E63946" />
+                <Text style={styles.logoutButtonText}>Sair da conta</Text>
+              </TouchableOpacity>
+              <Text style={styles.version}>Versão 1.0.0</Text>
+            </>
+          )}
+          <View style={styles.bottomSpacer} />
+        </ScrollView>
+        <BottomNavigation active="favorites" />
+      </View>
+    </PageTransition>
   );
 }
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F5F5F5" },
-  centerContent: { alignItems: "center", justifyContent: "center" },
-  loadingText: { marginTop: 12, fontSize: 16, color: "#666" },
   header: {
     flexDirection: "row",
     alignItems: "center",
