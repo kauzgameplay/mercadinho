@@ -1,6 +1,6 @@
 import { useCart } from "@/contexts/cart-context";
 import { Ionicons } from "@expo/vector-icons";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -23,6 +23,14 @@ export function BottomNavigation({
   const itemCount = getTotalItems();
   const insets = useSafeAreaInsets();
 
+  const handleHomePress = () => {
+    router.push("/(tabs)" as any);
+  };
+
+  const handleExplorePress = () => {
+    router.push("/(tabs)/explore" as any);
+  };
+
   const handleCartPress = () => {
     router.push("/cart" as any);
   };
@@ -36,45 +44,41 @@ export function BottomNavigation({
       <View
         style={[styles.nav, { paddingBottom: Math.max(insets.bottom, 10) }]}
       >
-        <Link href="/(tabs)" asChild>
-          <Pressable
-            style={styles.navItem}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        <Pressable
+          style={styles.navItem}
+          onPress={handleHomePress}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons
+            name="home"
+            size={24}
+            color={active === "home" ? "#FFF" : "#E0D4FF"}
+          />
+          <Text
+            style={active === "home" ? styles.navLabelActive : styles.navLabel}
           >
-            <Ionicons
-              name="home"
-              size={24}
-              color={active === "home" ? "#FFF" : "#E0D4FF"}
-            />
-            <Text
-              style={
-                active === "home" ? styles.navLabelActive : styles.navLabel
-              }
-            >
-              Home
-            </Text>
-          </Pressable>
-        </Link>
+            Home
+          </Text>
+        </Pressable>
 
-        <Link href="/(tabs)/explore" asChild>
-          <Pressable
-            style={styles.navItem}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        <Pressable
+          style={styles.navItem}
+          onPress={handleExplorePress}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons
+            name="pricetag-outline"
+            size={24}
+            color={active === "explore" ? "#FFF" : "#E0D4FF"}
+          />
+          <Text
+            style={
+              active === "explore" ? styles.navLabelActive : styles.navLabel
+            }
           >
-            <Ionicons
-              name="pricetag-outline"
-              size={24}
-              color={active === "explore" ? "#FFF" : "#E0D4FF"}
-            />
-            <Text
-              style={
-                active === "explore" ? styles.navLabelActive : styles.navLabel
-              }
-            >
-              Ofertas
-            </Text>
-          </Pressable>
-        </Link>
+            Ofertas
+          </Text>
+        </Pressable>
 
         {/* Carrinho */}
         <Pressable
