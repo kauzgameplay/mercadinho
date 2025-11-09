@@ -16,6 +16,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
+import { profileSchema } from "@/validators/profile";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -89,6 +90,22 @@ export default function ProfileScreen() {
       return;
     }
     try {
+      // validação com zod
+      const parsed = profileSchema.safeParse({
+        nome,
+        email,
+        telefone,
+        cpf,
+        endereco,
+        cidade,
+        estado,
+        cep,
+      });
+      if (!parsed.success) {
+        const first = parsed.error.issues[0];
+        Alert.alert("Erro", first?.message || "Dados inválidos");
+        return;
+      }
       setIsSaving(true);
       const response = await userAPI.updateUser({
         id: user.id,

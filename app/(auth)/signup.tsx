@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,65 +14,35 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { clienteAPI } from "../../services/api"; // path ajustado
-import { useUser } from "@/contexts/user-context";
-import { storageService } from "../../services/storage"; // path ajustado
+import { useSignup } from "@/hooks/auth/useSignup";
 
 export default function SignUpScreen() {
   const router = useRouter();
-  const { login: loginUser } = useUser();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-
+  const {
+    values,
+    errors,
+    loading,
+    showPassword,
+    showConfirmPassword,
+    setShowPassword,
+    setShowConfirmPassword,
+    setField,
+    submit,
+  } = useSignup();
   const handleSignUp = async () => {
-    if (!name || !email || !password) {
-      Alert.alert("Erro", "Por favor, preencha os campos obrigatórios");
-      return;
-    }
-    if (password.length < 6) {
-      Alert.alert("Erro", "A senha deve ter no mínimo 6 caracteres");
-      return;
-    }
-    if (password !== confirmPassword) {
-      Alert.alert("Erro", "As senhas não coincidem");
-      return;
-    }
-    setLoading(true);
-    try {
-      const result = await clienteAPI.register({
-        nome: name,
-        email: email,
-        senha: password,
-        telefone: phone || undefined,
-      });
-      if (result.success && result.cliente) {
-        await storageService.saveCliente(result.cliente);
-        const userData = {
-          ...result.cliente,
-          cpf: null,
-          cidade: null,
-          estado: null,
-          cep: null,
-          updatedAt: new Date().toISOString(),
-        };
-        await loginUser(userData);
-        Alert.alert("Sucesso! 🎉", "Sua conta foi criada com sucesso!", [
-          { text: "OK", onPress: () => router.replace("/(tabs)" as any) },
-        ]);
-      } else {
-        Alert.alert("Erro", result.message || "Erro ao criar conta");
-      }
-    } catch (error) {
-      Alert.alert("Erro", "Erro ao conectar com o servidor");
-      console.error("Erro no cadastro:", error);
-    } finally {
-      setLoading(false);
+    const ok = await submit();
+    if (!ok) {
+      // Mostra primeira mensagem de erro agregada
+      const firstError =
+        errors.name ||
+        errors.email ||
+        errors.password ||
+        errors.confirmPassword;
+      if (firstError) Alert.alert("Erro", firstError);
+    } else {
+      Alert.alert("Sucesso! 🎉", "Sua conta foi criada com sucesso!", [
+        { text: "OK", onPress: () => router.replace("/(tabs)" as any) },
+      ]);
     }
   };
 
@@ -118,10 +88,11 @@ export default function SignUpScreen() {
                 style={styles.input}
                 placeholder="Seu nome completo"
                 placeholderTextColor="#999"
-                value={name}
-                onChangeText={setName}
+                value={values.name}
+                onChangeText={(t) => setField("name", t)}
               />
             </View>
+            {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
           </View>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>E-mail</Text>
@@ -138,10 +109,13 @@ export default function SignUpScreen() {
                 placeholderTextColor="#999"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
+                value={values.email}
+                onChangeText={(t) => setField("email", t)}
               />
             </View>
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            )}
           </View>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Telefone</Text>
@@ -157,10 +131,13 @@ export default function SignUpScreen() {
                 placeholder="(00) 00000-0000"
                 placeholderTextColor="#999"
                 keyboardType="phone-pad"
-                value={phone}
-                onChangeText={setPhone}
+                value={values.phone || ""}
+                onChangeText={(t) => setField("phone", t)}
               />
             </View>
+            {errors.phone && (
+              <Text style={styles.errorText}>{errors.phone}</Text>
+            )}
           </View>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Senha</Text>
@@ -176,8 +153,8 @@ export default function SignUpScreen() {
                 placeholder="Mínimo 6 caracteres"
                 placeholderTextColor="#999"
                 secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={setPassword}
+                value={values.password}
+                onChangeText={(t) => setField("password", t)}
               />
               <TouchableOpacity
                 onPress={() => setShowPassword(!showPassword)}
@@ -205,9 +182,15 @@ export default function SignUpScreen() {
                 placeholder="Repita sua senha"
                 placeholderTextColor="#999"
                 secureTextEntry={!showConfirmPassword}
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
+                value={values.confirmPassword}
+                onChangeText={(t) => setField("confirmPassword", t)}
               />
+              {errors.password && (
+                <Text style={styles.errorText}>{errors.password}</Text>
+              )}
+              {errors.confirmPassword && (
+                <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+              )}
               <TouchableOpacity
                 onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                 style={styles.eyeIcon}
@@ -324,4 +307,5 @@ const styles = StyleSheet.create({
   },
   loginText: { fontSize: 14, color: "#666" },
   loginLink: { fontSize: 14, fontWeight: "700", color: "#7C3AED" },
+  errorText: { color: "#EF4444", marginTop: 6, fontSize: 12 },
 });

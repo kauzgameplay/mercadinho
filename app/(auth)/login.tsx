@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,46 +14,26 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { clienteAPI } from "../../services/api"; // path ajustado após mover para (auth)
-import { storageService } from "../../services/storage"; // path ajustado
-import { useUser } from "@/contexts/user-context";
+import { useLogin } from "@/hooks/auth/useLogin";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { login: loginUser } = useUser();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-
+  const {
+    values,
+    errors,
+    loading,
+    showPassword,
+    setShowPassword,
+    setField,
+    submit,
+  } = useLogin();
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Erro", "Por favor, preencha todos os campos");
-      return;
-    }
-    setLoading(true);
-    try {
-      const result = await clienteAPI.login(email, password);
-      if (result.success && result.cliente) {
-        await storageService.saveCliente(result.cliente);
-        const userData = {
-          ...result.cliente,
-          cpf: null,
-          cidade: null,
-          estado: null,
-          cep: null,
-          updatedAt: new Date().toISOString(),
-        };
-        await loginUser(userData);
-        router.replace("/(tabs)" as any);
-      } else {
-        Alert.alert("Erro", result.message || "Erro ao fazer login");
-      }
-    } catch (error) {
-      Alert.alert("Erro", "Erro ao conectar com o servidor");
-      console.error("Erro no login:", error);
-    } finally {
-      setLoading(false);
+    const ok = await submit();
+    if (!ok && (errors.email || errors.password)) {
+      Alert.alert(
+        "Erro",
+        errors.email || errors.password || "Erro ao fazer login"
+      );
     }
   };
 
@@ -102,10 +82,13 @@ export default function LoginScreen() {
                 placeholderTextColor="#999"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
+                value={values.email}
+                onChangeText={(t) => setField("email", t)}
               />
             </View>
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            )}
           </View>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Senha</Text>
@@ -121,8 +104,8 @@ export default function LoginScreen() {
                 placeholder="Sua senha"
                 placeholderTextColor="#999"
                 secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={setPassword}
+                value={values.password}
+                onChangeText={(t) => setField("password", t)}
               />
               <TouchableOpacity
                 onPress={() => setShowPassword(!showPassword)}
@@ -135,6 +118,9 @@ export default function LoginScreen() {
                 />
               </TouchableOpacity>
             </View>
+            {errors.password && (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            )}
           </View>
           <TouchableOpacity
             style={styles.forgotPassword}
@@ -242,4 +228,5 @@ const styles = StyleSheet.create({
   },
   signupText: { fontSize: 14, color: "#666" },
   signupLink: { fontSize: 14, fontWeight: "700", color: "#7C3AED" },
+  errorText: { color: "#EF4444", marginTop: 6, fontSize: 12 },
 });
