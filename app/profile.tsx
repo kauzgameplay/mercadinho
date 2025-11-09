@@ -406,7 +406,8 @@ export default function ProfileScreen() {
         <View style={styles.bottomSpacer} />
       </ScrollView>
 
-      <BottomNavigation active="home" />
+      {/* Passa a aba ativa correta para destacar o ícone de Conta */}
+      <BottomNavigation active="favorites" />
     </View>
   );
 }

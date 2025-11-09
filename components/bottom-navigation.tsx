@@ -94,8 +94,18 @@ export function BottomNavigation({
           style={styles.navItem}
           onPress={() => handleNavigate("favorites")}
         >
-          <Ionicons name="person-outline" size={24} color="#E0D4FF" />
-          <Text style={styles.navLabel}>Conta</Text>
+          <Ionicons
+            name="person-outline"
+            size={24}
+            color={active === "favorites" ? "#FFF" : "#E0D4FF"}
+          />
+          <Text
+            style={
+              active === "favorites" ? styles.navLabelActive : styles.navLabel
+            }
+          >
+            Conta
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
