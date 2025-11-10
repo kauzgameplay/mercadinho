@@ -1,8 +1,16 @@
-// Configuração da API
-// IMPORTANTE: Substitua pelo IP da sua máquina na rede local
-// Para descobrir seu IP: ipconfig (Windows) ou ifconfig (Mac/Linux)
-// Configuração da API
-const API_URL = "https://santafe-dashboard.vercel.app/api";
+import { config, logger } from "../config/app.config";
+
+// Configuração da API a partir de variáveis de ambiente
+const API_URL = config.apiUrl;
+
+// Valida URL da API no carregamento
+if (!API_URL) {
+  throw new Error(
+    "❌ EXPO_PUBLIC_API_URL não está configurada! Verifique o arquivo .env"
+  );
+}
+
+logger.log("API URL configurada:", API_URL);
 
 export interface ClienteData {
   id: string;

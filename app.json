@@ -53,7 +53,12 @@
       "router": {},
       "eas": {
         "projectId": "87a5a92c-b033-4eca-b825-0f7e09cbea72"
-      }
+      },
+      "EXPO_PUBLIC_API_URL": "https://santafe-dashboard.vercel.app/api",
+      "EXPO_PUBLIC_ENV": "production",
+      "EXPO_PUBLIC_DEBUG": "false",
+      "EXPO_PUBLIC_ENABLE_LOGS": "false",
+      "EXPO_PUBLIC_API_TIMEOUT": "15000"
     },
     "runtimeVersion": {
       "policy": "sdkVersion"
