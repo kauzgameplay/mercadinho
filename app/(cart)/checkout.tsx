@@ -7,11 +7,13 @@ import {
   Alert,
   ActivityIndicator,
   TextInput,
+  StyleSheet,
+  StatusBar,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useCart } from "@/contexts/cart-context";
 import { useUser } from "@/contexts/user-context";
-import api from "@/services/api";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function CheckoutScreen() {
   const router = useRouter();
@@ -50,21 +52,32 @@ export default function CheckoutScreen() {
     setLoading(true);
 
     try {
-      const response = await api.post("/pedidos", {
-        clienteId: user.id,
-        itens: items.map((item: { id: string; quantity: number }) => ({
-          produtoId: item.id,
-          quantidade: item.quantity,
-        })),
-      });
+      const response = await fetch(
+        "https://santafe-dashboard.vercel.app/api/pedidos",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            clienteId: user.id,
+            itens: items.map((item) => ({
+              produtoId: String(item.id),
+              quantidade: item.quantity,
+            })),
+          }),
+        }
+      );
 
-      if (response.data.success) {
+      const data = await response.json();
+
+      if (data.success) {
         clearCart();
         Alert.alert(
           "Sucesso! 🎉",
-          `Pedido #${
-            response.data.pedido.id
-          } realizado com sucesso!\n\nTotal: R$ ${totalComTaxa.toFixed(2)}`,
+          `Pedido realizado com sucesso!\n\nTotal: R$ ${totalComTaxa.toFixed(
+            2
+          )}`,
           [
             {
               text: "Ver Meus Pedidos",
@@ -77,18 +90,11 @@ export default function CheckoutScreen() {
           ]
         );
       } else {
-        Alert.alert(
-          "Erro",
-          response.data.message || "Erro ao finalizar pedido"
-        );
+        Alert.alert("Erro", data.message || "Erro ao finalizar pedido");
       }
     } catch (error: any) {
       console.error("Erro ao finalizar pedido:", error);
-      Alert.alert(
-        "Erro",
-        error.response?.data?.message ||
-          "Erro ao processar pedido. Tente novamente."
-      );
+      Alert.alert("Erro", "Erro ao processar pedido. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -96,152 +102,134 @@ export default function CheckoutScreen() {
 
   if (!user) {
     return (
-      <View className="flex-1 justify-center items-center bg-gray-50 p-6">
-        <Text className="text-2xl font-bold text-gray-900 mb-4">
-          Faça login para continuar
-        </Text>
-        <Text className="text-gray-600 text-center mb-8">
+      <View style={styles.emptyContainer}>
+        <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
+        <Text style={styles.emptyTitle}>Faça login para continuar</Text>
+        <Text style={styles.emptySubtitle}>
           Você precisa estar logado para finalizar seu pedido
         </Text>
         <TouchableOpacity
           onPress={() => router.push("/(auth)/login")}
-          className="bg-violet-600 px-8 py-4 rounded-xl"
+          style={styles.loginButton}
         >
-          <Text className="text-white font-semibold text-lg">Fazer Login</Text>
+          <Text style={styles.loginButtonText}>Fazer Login</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-gray-50">
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View className="bg-violet-600 pt-16 pb-8 px-6">
-          <TouchableOpacity onPress={() => router.back()} className="mb-4">
-            <Text className="text-white text-3xl">←</Text>
-          </TouchableOpacity>
-          <Text className="text-white text-3xl font-bold">
-            Finalizar Pedido
-          </Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Finalizar Pedido</Text>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Dados do Cliente */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Dados de Entrega</Text>
+
+          <Text style={styles.label}>Nome</Text>
+          <View style={styles.inputDisabled}>
+            <Text style={styles.inputDisabledText}>{user.nome}</Text>
+          </View>
+
+          <Text style={styles.label}>Email</Text>
+          <View style={styles.inputDisabled}>
+            <Text style={styles.inputDisabledText}>{user.email}</Text>
+          </View>
+
+          <Text style={styles.label}>Telefone *</Text>
+          <TextInput
+            value={telefone}
+            onChangeText={setTelefone}
+            placeholder="(00) 00000-0000"
+            keyboardType="phone-pad"
+            style={styles.input}
+            placeholderTextColor="#9CA3AF"
+          />
+
+          <Text style={styles.label}>Endereço de Entrega *</Text>
+          <TextInput
+            value={endereco}
+            onChangeText={setEndereco}
+            placeholder="Rua, número, bairro, cidade"
+            multiline
+            numberOfLines={3}
+            style={[styles.input, styles.textArea]}
+            placeholderTextColor="#9CA3AF"
+          />
         </View>
 
-        <View className="px-6 py-6">
-          {/* Dados do Cliente */}
-          <View className="bg-white rounded-2xl p-6 mb-4 shadow-sm">
-            <Text className="text-xl font-bold text-gray-900 mb-4">
-              Dados de Entrega
-            </Text>
+        {/* Resumo do Pedido */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Resumo do Pedido</Text>
 
-            <Text className="text-gray-700 font-medium mb-2">Nome</Text>
-            <View className="bg-gray-100 p-4 rounded-xl mb-4">
-              <Text className="text-gray-900">{user.nome}</Text>
-            </View>
-
-            <Text className="text-gray-700 font-medium mb-2">Email</Text>
-            <View className="bg-gray-100 p-4 rounded-xl mb-4">
-              <Text className="text-gray-900">{user.email}</Text>
-            </View>
-
-            <Text className="text-gray-700 font-medium mb-2">Telefone *</Text>
-            <TextInput
-              value={telefone}
-              onChangeText={setTelefone}
-              placeholder="(00) 00000-0000"
-              keyboardType="phone-pad"
-              className="bg-gray-100 p-4 rounded-xl mb-4 text-gray-900"
-            />
-
-            <Text className="text-gray-700 font-medium mb-2">
-              Endereço de Entrega *
-            </Text>
-            <TextInput
-              value={endereco}
-              onChangeText={setEndereco}
-              placeholder="Rua, número, bairro, cidade"
-              multiline
-              numberOfLines={3}
-              className="bg-gray-100 p-4 rounded-xl text-gray-900"
-              style={{ minHeight: 80 }}
-            />
-          </View>
-
-          {/* Resumo do Pedido */}
-          <View className="bg-white rounded-2xl p-6 mb-4 shadow-sm">
-            <Text className="text-xl font-bold text-gray-900 mb-4">
-              Resumo do Pedido
-            </Text>
-
-            {items.map(
-              (item: {
-                id: string;
-                quantity: number;
-                nome: string;
-                preco: number;
-              }) => (
-                <View key={item.id} className="flex-row justify-between mb-3">
-                  <Text className="text-gray-700 flex-1">
-                    {item.quantity}x {item.nome}
-                  </Text>
-                  <Text className="text-gray-900 font-medium">
-                    R$ {(item.preco * item.quantity).toFixed(2)}
-                  </Text>
-                </View>
-              )
-            )}
-
-            <View className="border-t border-gray-200 mt-4 pt-4">
-              <View className="flex-row justify-between mb-2">
-                <Text className="text-gray-600">Subtotal</Text>
-                <Text className="text-gray-900 font-medium">
-                  R$ {total.toFixed(2)}
-                </Text>
-              </View>
-              <View className="flex-row justify-between mb-2">
-                <Text className="text-gray-600">Taxa de Entrega</Text>
-                <Text className="text-gray-900 font-medium">
-                  R$ {taxaEntrega.toFixed(2)}
-                </Text>
-              </View>
-              <View className="flex-row justify-between mt-2 pt-2 border-t border-gray-200">
-                <Text className="text-xl font-bold text-gray-900">Total</Text>
-                <Text className="text-xl font-bold text-violet-600">
-                  R$ {totalComTaxa.toFixed(2)}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Método de Pagamento */}
-          <View className="bg-white rounded-2xl p-6 mb-4 shadow-sm">
-            <Text className="text-xl font-bold text-gray-900 mb-4">
-              Método de Pagamento
-            </Text>
-            <View className="bg-gray-100 p-4 rounded-xl">
-              <Text className="text-gray-900 font-medium">
-                💵 Pagamento na Entrega
+          {items.map((item) => (
+            <View key={item.id} style={styles.itemRow}>
+              <Text style={styles.itemText}>
+                {item.quantity}x {item.name}
               </Text>
-              <Text className="text-gray-600 text-sm mt-1">
-                Pague em dinheiro ou cartão no momento da entrega
+              <Text style={styles.itemPrice}>
+                R$ {(item.price * item.quantity).toFixed(2)}
               </Text>
             </View>
+          ))}
+
+          <View style={styles.divider} />
+
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Subtotal</Text>
+            <Text style={styles.summaryValue}>R$ {total.toFixed(2)}</Text>
+          </View>
+
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Taxa de Entrega</Text>
+            <Text style={styles.summaryValue}>R$ {taxaEntrega.toFixed(2)}</Text>
+          </View>
+
+          <View style={[styles.divider, { marginTop: 8 }]} />
+
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalValue}>R$ {totalComTaxa.toFixed(2)}</Text>
+          </View>
+        </View>
+
+        {/* Método de Pagamento */}
+        <View style={[styles.card, { marginBottom: 100 }]}>
+          <Text style={styles.cardTitle}>Método de Pagamento</Text>
+          <View style={styles.paymentMethod}>
+            <Text style={styles.paymentMethodTitle}>
+              💵 Pagamento na Entrega
+            </Text>
+            <Text style={styles.paymentMethodSubtitle}>
+              Pague em dinheiro ou cartão no momento da entrega
+            </Text>
           </View>
         </View>
       </ScrollView>
 
       {/* Botão Finalizar */}
-      <View className="bg-white border-t border-gray-200 p-6">
+      <View style={styles.footer}>
         <TouchableOpacity
           onPress={finalizarPedido}
           disabled={loading}
-          className={`py-4 rounded-xl ${
-            loading ? "bg-gray-400" : "bg-violet-600"
-          }`}
+          style={[styles.finishButton, loading && styles.finishButtonDisabled]}
         >
           {loading ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text className="text-white text-center font-bold text-lg">
+            <Text style={styles.finishButtonText}>
               Finalizar Pedido - R$ {totalComTaxa.toFixed(2)}
             </Text>
           )}
@@ -250,3 +238,193 @@ export default function CheckoutScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F9FAFB",
+  },
+  header: {
+    backgroundColor: "#7C3AED",
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  backButton: {
+    marginRight: 16,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#111827",
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 8,
+    marginTop: 8,
+  },
+  input: {
+    backgroundColor: "#F3F4F6",
+    padding: 12,
+    borderRadius: 12,
+    fontSize: 16,
+    color: "#111827",
+  },
+  textArea: {
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+  inputDisabled: {
+    backgroundColor: "#F3F4F6",
+    padding: 12,
+    borderRadius: 12,
+  },
+  inputDisabledText: {
+    fontSize: 16,
+    color: "#111827",
+  },
+  itemRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  itemText: {
+    fontSize: 14,
+    color: "#374151",
+    flex: 1,
+  },
+  itemPrice: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#E5E7EB",
+    marginVertical: 16,
+  },
+  summaryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: "#6B7280",
+  },
+  summaryValue: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  totalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 8,
+  },
+  totalLabel: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#111827",
+  },
+  totalValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#7C3AED",
+  },
+  paymentMethod: {
+    backgroundColor: "#F3F4F6",
+    padding: 16,
+    borderRadius: 12,
+  },
+  paymentMethodTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  paymentMethodSubtitle: {
+    fontSize: 12,
+    color: "#6B7280",
+    marginTop: 4,
+  },
+  footer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#E5E7EB",
+    padding: 20,
+  },
+  finishButton: {
+    backgroundColor: "#7C3AED",
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  finishButtonDisabled: {
+    backgroundColor: "#9CA3AF",
+  },
+  finishButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
+    padding: 24,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#111827",
+    marginBottom: 16,
+  },
+  emptySubtitle: {
+    fontSize: 16,
+    color: "#6B7280",
+    textAlign: "center",
+    marginBottom: 32,
+  },
+  loginButton: {
+    backgroundColor: "#7C3AED",
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+  },
+  loginButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+});
